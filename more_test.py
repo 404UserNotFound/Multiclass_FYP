@@ -7,6 +7,7 @@ import tensorflow as tf
 from tensorflow.keras import layers
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.callbacks import EarlyStopping
+from keras.preprocessing import image
 
 dataset_url = "C:/Users/Mihaela/Downloads/multiclass_small"
 
@@ -49,7 +50,6 @@ model = Sequential([
 
 model.load_weights('weights.h5')
 
-from keras.preprocessing import image
 
 img_path = 'C:\\Users\\Mihaela\\Downloads\\test_photo\\a0228-IMG_2688.jpg'
 img = image.load_img(img_path, target_size=(256, 256)) # if a you want a spesific image size
