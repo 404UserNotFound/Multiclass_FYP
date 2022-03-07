@@ -9,14 +9,14 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.callbacks import EarlyStopping
 import pathlib
 
-dataset_url = "C:/Users/Mihaela/Downloads/multiclass_small"
+dataset_url = "C:/Users/Mihaela/Downloads/multiclass"
 
 data_dir = os.path.abspath(dataset_url)
 
 data_dir = pathlib.Path(data_dir)
-image_count = len(list(data_dir.glob('*/*.jpg')))
+"""image_count = len(list(data_dir.glob('*/*.jpg')))
 print(image_count)
-"""correct = list(data_dir.glob('correct/*'))
+correct = list(data_dir.glob('correct/*'))
 PIL.Image.open(str(correct[0]))
 PIL.Image.open(str(correct[1]))
 underexposed = list(data_dir.glob('underexposed/*'))
@@ -58,16 +58,16 @@ for image_batch, labels_batch in train_ds:
 AUTOTUNE = tf.data.AUTOTUNE
 train_ds = train_ds.cache().shuffle(1000).prefetch(buffer_size=AUTOTUNE)
 val_ds = val_ds.cache().prefetch(buffer_size=AUTOTUNE)
-normalization_layer = layers.Rescaling(1./255)
+"""normalization_layer = layers.Rescaling(1./255)
 normalized_ds = train_ds.map(lambda x, y: (normalization_layer(x), y))
 image_batch, labels_batch = next(iter(normalized_ds))
 first_image = image_batch[0]
 # Notice the pixel values are now in `[0,1]`.
-print(np.min(first_image), np.max(first_image))
+print(np.min(first_image), np.max(first_image))"""
 
 num_classes = len(class_names)
 
-model = Sequential([
+"""model = Sequential([
   layers.Rescaling(1./255, input_shape=(img_height, img_width, 3)),
   layers.Conv2D(16, 3, padding='same', activation='relu'),
   layers.MaxPooling2D(),
@@ -79,19 +79,63 @@ model = Sequential([
   layers.Dense(128, activation='relu'),
   layers.Dense(num_classes)
 
+])"""
+data_augmentation = tf.keras.Sequential(
+  [
+    tf.keras.layers.RandomFlip("horizontal",
+                      input_shape=(img_height,
+                                  img_width,
+                                  3)),
+    tf.keras.layers.RandomRotation(0.1),
+    tf.keras.layers.RandomZoom(0.1),
+  ]
+)
+#VISUALISE DATA AUG
+plt.figure(figsize=(10, 10))
+for images, _ in train_ds.take(1):
+  for i in range(9):
+    augmented_images = data_augmentation(images)
+    ax = plt.subplot(3, 3, i + 1)
+    plt.imshow(augmented_images[0].numpy().astype("uint8"))
+    plt.axis("off")
+
+model = Sequential([
+  data_augmentation,
+  tf.keras.layers.Rescaling(1./255),
+  layers.Conv2D(16, 3, padding='same', activation='relu'),
+  layers.Dropout(0.5),
+  layers.MaxPooling2D(),
+  layers.Conv2D(32, 3, padding='same', activation='relu'),
+  layers.Dropout(0.5),
+  layers.MaxPooling2D(),
+  layers.Conv2D(64, 3, padding='same', activation='relu'),
+  layers.Dropout(0.5),
+  layers.MaxPooling2D(),
+  layers.Conv2D(128, 3, padding='same', activation='relu'),
+  layers.Dropout(0.5),
+  layers.MaxPooling2D(),
+  #layers.Dropout(0.5), #TRY CHANGE TO POINT 0.5 from 0.2
+  layers.Flatten(),
+  layers.Dense(128, activation='relu'), #CHANGED FROM 128
+  layers.Dense(num_classes)
 ])
+
+print("Loading weights.")
+model.load_weights('dropout_every_conv_layer.h5')
+print("weights loaded!")
 
 model.compile(optimizer='adam',
               loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
               metrics=['accuracy'])
-early_stop = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=10)
+early_stop = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=3)
+#learning_rate = ReduceLROnPlateau(monitor='val_loss', factor 0.5, patience=1,verbose=1)
 model.summary()
 
 history = model.fit(
     train_ds,
     validation_data=val_ds,
-    epochs=20,
-    callbacks=[early_stop]
+    epochs=300,
+    callbacks=[early_stop] #add learning_rate too
 )
 
 
@@ -116,7 +160,7 @@ plt.plot(val_loss, label='Validation Loss')
 plt.legend(loc='upper right')
 plt.title('Training and Validation Loss')
 plt.show()
-test_url = "C:\\Users\\Mihaela\\Downloads\\test_photo\\a0282-20060619_125715__MG_9197_0.JPG"
+test_url = "C:\\Users\\Mihaela\\Downloads\\test_photo\\overex_a_tinge.JPG"
 
 img = tf.keras.utils.load_img(
     test_url, target_size=(img_height, img_width)
@@ -132,7 +176,7 @@ print(
     .format(class_names[np.argmax(score)], 100 * np.max(score))
 )
 # serialize weights to HDF5
-model.save_weights('weights.h5')
-model.save('./model_tf', save_format='tf')
+model.save_weights('dropout_every_conv_layer2.h5')
+#model.save('./model_tf', save_format='tf') THIS DOES NOT WORK WITH AUGMENTATION LAYERS
 print("Saved model to disk")
 
