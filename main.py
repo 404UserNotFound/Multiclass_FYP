@@ -4,20 +4,19 @@ import os
 import PIL
 import tensorflow as tf
 from keras.callbacks import ReduceLROnPlateau
-
 from tensorflow.keras import layers
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.callbacks import EarlyStopping
 import pathlib
 
-dataset_url = "C:/Users/Mihaela/Downloads/multiclass"
+dataset_url = "C:/Users/Mihaela/Downloads/multiclass_trimmed"
 
 data_dir = os.path.abspath(dataset_url)
 
 data_dir = pathlib.Path(data_dir)
 batch_size = 32
-img_height = 256
-img_width = 256
+img_height = 227    #256
+img_width = 227
 train_ds = tf.keras.utils.image_dataset_from_directory(
     data_dir,
     validation_split=0.2,
@@ -40,25 +39,13 @@ val_ds = val_ds.cache().prefetch(buffer_size=AUTOTUNE)
 
 num_classes = len(class_names)
 
-"""model = Sequential([
-  layers.Rescaling(1./255, input_shape=(img_height, img_width, 3)),
-  layers.Conv2D(16, 3, padding='same', activation='relu'),
-  layers.MaxPooling2D(),
-  layers.Conv2D(32, 3, padding='same', activation='relu'),
-  layers.MaxPooling2D(),
-  layers.Conv2D(64, 3, padding='same', activation='relu'),
-  layers.MaxPooling2D(),
-  layers.Flatten(),
-  layers.Dense(128, activation='relu'),
-  layers.Dense(num_classes)
 
-])"""
 data_augmentation = tf.keras.Sequential(
     [
         tf.keras.layers.RandomFlip("horizontal",
                                    input_shape=(img_height, img_width, 3)),
         tf.keras.layers.RandomRotation(0.1),
-        tf.keras.layers.RandomZoom(0.1),
+        tf.keras.layers.RandomZoom(0.1)
     ]
 )
 # VISUALISE DATA AUG
@@ -70,42 +57,44 @@ for images, _ in train_ds.take(1):
         plt.imshow(augmented_images[0].numpy().astype("uint8"))
         plt.axis("off")
 
-model = Sequential([
-    data_augmentation,
-    tf.keras.layers.Rescaling(1. / 255),
-    layers.Conv2D(32, 3, padding='same', activation='relu'),
-    layers.Dropout(0.5),
-    layers.MaxPooling2D(),
-    layers.Conv2D(64, 3, padding='same', activation='relu'),
-    layers.Dropout(0.5),
-    layers.MaxPooling2D(),
-    layers.Conv2D(128, 3, padding='same', activation='relu'),
-    layers.Dropout(0.5),
-    layers.MaxPooling2D(),
-    layers.Conv2D(256, 3, padding='same', activation='relu'),
-    layers.Dropout(0.5),
-    layers.MaxPooling2D(),
-    # layers.Dropout(0.5), #TRY CHANGE TO POINT 0.5 from 0.2
-    layers.Flatten(),
-    layers.Dense(512, activation='relu'),  # CHANGED FROM relu and 128
-    layers.Dense(num_classes)
+model = tf.keras.models.Sequential([
+    tf.keras.layers.Conv2D(filters=96, kernel_size=(11,11), strides=(4,4), activation='relu', input_shape=(227,227,3)),
+    tf.keras.layers.BatchNormalization(),
+    tf.keras.layers.MaxPool2D(pool_size=(3,3), strides=(2,2)),
+    tf.keras.layers.Conv2D(filters=256, kernel_size=(5,5), strides=(1,1), activation='relu', padding="same"),
+    tf.keras.layers.BatchNormalization(),
+    tf.keras.layers.MaxPool2D(pool_size=(3,3), strides=(2,2)),
+    tf.keras.layers.Conv2D(filters=384, kernel_size=(3,3), strides=(1,1), activation='relu', padding="same"),
+    tf.keras.layers.BatchNormalization(),
+    tf.keras.layers.Conv2D(filters=384, kernel_size=(3,3), strides=(1,1), activation='relu', padding="same"),
+    tf.keras.layers.BatchNormalization(),
+    tf.keras.layers.Conv2D(filters=256, kernel_size=(3,3), strides=(1,1), activation='relu', padding="same"),
+    tf.keras.layers.BatchNormalization(),
+    tf.keras.layers.MaxPool2D(pool_size=(3,3), strides=(2,2)),
+    tf.keras.layers.Flatten(),
+    tf.keras.layers.Dense(4096, activation='relu'),
+    tf.keras.layers.Dropout(0.5),
+    tf.keras.layers.Dense(4096, activation='relu'),
+    tf.keras.layers.Dropout(0.5),
+    tf.keras.layers.Dense(3, activation='softmax')
 ])
 
 print("Loading weights.")
-model.load_weights('relu_fullimgsize_removeLRplateau_512dense.h5')
+#model.load_weights('alexnet_layers.h5')
 print("weights loaded!")
-
-model.compile(optimizer='adam',
-              loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
+##dont forget you changed from_logits to false
+model.compile(optimizer=tf.keras.optimizers.SGD(learning_rate=0.001),
+              loss='sparse_categorical_crossentropy',
               metrics=['accuracy'])
-early_stop = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=3)
+early_stop = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=5)
 #learning_rate = ReduceLROnPlateau(monitor='val_loss', factor=0.5, patience=1, verbose=1)
 model.summary()
 
 history = model.fit(
     train_ds,
     validation_data=val_ds,
-    epochs=300,
+    validation_freq=1,
+    epochs=15,
     callbacks=[early_stop]  # add learning_rate too
 )
 
@@ -146,6 +135,6 @@ print(
         .format(class_names[np.argmax(score)], 100 * np.max(score))
 )
 # serialize weights to HDF5
-model.save_weights('relu_fullimgsize_removeLRplateau_512dense2.h5')
+model.save_weights('alexnet_layers_15epoch.h5')
 # model.save('./model_tf', save_format='tf') THIS DOES NOT WORK WITH AUGMENTATION LAYERS
 print("Saved model to disk")
