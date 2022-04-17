@@ -1,99 +1,95 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import os
-import PIL
 import tensorflow as tf
-
-from tensorflow.keras import layers
-from tensorflow.keras.models import Sequential
+from keras.callbacks import ReduceLROnPlateau
 from tensorflow.keras.callbacks import EarlyStopping
 import pathlib
 
-dataset_url = "C:/Users/Mihaela/Downloads/multiclass_small"
+dataset_url = "C:/Users/Mihaela/Downloads/multiclass_trimmed"
 
 data_dir = os.path.abspath(dataset_url)
 
 data_dir = pathlib.Path(data_dir)
-image_count = len(list(data_dir.glob('*/*.jpg')))
-print(image_count)
-"""correct = list(data_dir.glob('correct/*'))
-PIL.Image.open(str(correct[0]))
-PIL.Image.open(str(correct[1]))
-underexposed = list(data_dir.glob('underexposed/*'))
-PIL.Image.open(str(underexposed[0]))
-PIL.Image.open(str(underexposed[1]))
-overexposed = list(data_dir.glob('overexposed/*'))
-PIL.Image.open(str(overexposed[0]))
-PIL.Image.open(str(overexposed[1]))"""
 batch_size = 32
-img_height = 256
-img_width = 256
+img_height = 227
+img_width = 227
 train_ds = tf.keras.utils.image_dataset_from_directory(
-  data_dir,
-  validation_split=0.2,
-  subset="training",
-  seed=123,
-  image_size=(img_height, img_width),
-  batch_size=batch_size)
+    data_dir,
+    validation_split=0.2,
+    subset="training",
+    seed=123,
+    image_size=(img_height, img_width),
+    batch_size=batch_size)
 val_ds = tf.keras.utils.image_dataset_from_directory(
-  data_dir,
-  validation_split=0.2,
-  subset="validation",
-  seed=123,
-  image_size=(img_height, img_width),
-  batch_size=batch_size)
+    data_dir,
+    validation_split=0.2,
+    subset="validation",
+    seed=123,
+    image_size=(img_height, img_width),
+    batch_size=batch_size)
 class_names = train_ds.class_names
 print(class_names)
-"""plt.figure(figsize=(10, 10))
-for images, labels in train_ds.take(1):
-  for i in range(9):
-    ax = plt.subplot(3, 3, i + 1)
-    plt.imshow(images[i].numpy().astype("uint8"))
-    plt.title(class_names[labels[i]])
-    plt.axis("off")
-for image_batch, labels_batch in train_ds:
-    print(image_batch.shape)
-    print(labels_batch.shape)
-    break"""
 AUTOTUNE = tf.data.AUTOTUNE
 train_ds = train_ds.cache().shuffle(1000).prefetch(buffer_size=AUTOTUNE)
 val_ds = val_ds.cache().prefetch(buffer_size=AUTOTUNE)
-normalization_layer = layers.Rescaling(1./255)
-normalized_ds = train_ds.map(lambda x, y: (normalization_layer(x), y))
-image_batch, labels_batch = next(iter(normalized_ds))
-first_image = image_batch[0]
-# Notice the pixel values are now in `[0,1]`.
-print(np.min(first_image), np.max(first_image))
 
 num_classes = len(class_names)
 
-model = Sequential([
-  layers.Rescaling(1./255, input_shape=(img_height, img_width, 3)),
-  layers.Conv2D(16, 3, padding='same', activation='relu'),
-  layers.MaxPooling2D(),
-  layers.Conv2D(32, 3, padding='same', activation='relu'),
-  layers.MaxPooling2D(),
-  layers.Conv2D(64, 3, padding='same', activation='relu'),
-  layers.MaxPooling2D(),
-  layers.Flatten(),
-  layers.Dense(128, activation='relu'),
-  layers.Dense(num_classes)
 
+data_augmentation = tf.keras.Sequential(
+    [
+        tf.keras.layers.RandomFlip("horizontal",
+                                   input_shape=(img_height, img_width, 3)),
+        tf.keras.layers.RandomRotation(0.1),
+        tf.keras.layers.RandomZoom(0.1)
+    ]
+)
+# SHOW DATA AUUGMENTATIONS
+plt.figure(figsize=(10, 10))
+for images, _ in train_ds.take(1):
+    for i in range(9):
+        augmented_images = data_augmentation(images)
+        ax = plt.subplot(3, 3, i + 1)
+        plt.imshow(augmented_images[0].numpy().astype("uint8"))
+        plt.axis("off")
+
+model = tf.keras.models.Sequential([
+    tf.keras.layers.Conv2D(filters=96, kernel_size=(11,11), strides=(4,4), activation='relu', input_shape=(227,227,3)),
+    tf.keras.layers.BatchNormalization(),
+    tf.keras.layers.MaxPool2D(pool_size=(3,3), strides=(2,2)),
+    tf.keras.layers.Conv2D(filters=256, kernel_size=(5,5), strides=(1,1), activation='relu', padding="same"),
+    tf.keras.layers.BatchNormalization(),
+    tf.keras.layers.MaxPool2D(pool_size=(3,3), strides=(2,2)),
+    tf.keras.layers.Conv2D(filters=384, kernel_size=(3,3), strides=(1,1), activation='relu', padding="same"),
+    tf.keras.layers.BatchNormalization(),
+    tf.keras.layers.Conv2D(filters=384, kernel_size=(3,3), strides=(1,1), activation='relu', padding="same"),
+    tf.keras.layers.BatchNormalization(),
+    tf.keras.layers.Conv2D(filters=256, kernel_size=(3,3), strides=(1,1), activation='relu', padding="same"),
+    tf.keras.layers.BatchNormalization(),
+    tf.keras.layers.MaxPool2D(pool_size=(3,3), strides=(2,2)),
+    tf.keras.layers.Flatten(),
+    tf.keras.layers.Dense(4096, activation='relu'),
+    tf.keras.layers.Dropout(0.5),
+    tf.keras.layers.Dense(4096, activation='relu'),
+    tf.keras.layers.Dropout(0.5),
+    tf.keras.layers.Dense(3, activation='softmax')
 ])
 
-model.compile(optimizer='adam',
-              loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
+model.compile(optimizer=tf.keras.optimizers.SGD(learning_rate=0.001),
+              loss='sparse_categorical_crossentropy',
               metrics=['accuracy'])
-early_stop = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=10)
+early_stop = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=5)
+#learning_rate = ReduceLROnPlateau(monitor='val_loss', factor=0.5, patience=1, verbose=1)
 model.summary()
 
 history = model.fit(
     train_ds,
     validation_data=val_ds,
-    epochs=20,
+    validation_freq=1,
+    epochs=15,
     callbacks=[early_stop]
 )
-
 
 acc = history.history['accuracy']
 val_acc = history.history['val_accuracy']
@@ -101,7 +97,6 @@ val_acc = history.history['val_accuracy']
 loss = history.history['loss']
 val_loss = history.history['val_loss']
 
-#epochs_range = range(epochs)
 
 plt.figure(figsize=(8, 8))
 plt.subplot(1, 2, 1)
@@ -116,7 +111,7 @@ plt.plot(val_loss, label='Validation Loss')
 plt.legend(loc='upper right')
 plt.title('Training and Validation Loss')
 plt.show()
-test_url = "C:\\Users\\Mihaela\\Downloads\\test_photo\\a0282-20060619_125715__MG_9197_0.JPG"
+test_url = "C:\\Users\\Mihaela\\Downloads\\test_photo\\barely_under.JPG"
 
 img = tf.keras.utils.load_img(
     test_url, target_size=(img_height, img_width)
@@ -129,10 +124,9 @@ score = tf.nn.softmax(predictions[0])
 
 print(
     "This image most likely belongs to {} with a {:.2f} percent confidence."
-    .format(class_names[np.argmax(score)], 100 * np.max(score))
+        .format(class_names[np.argmax(score)], 100 * np.max(score))
 )
-# serialize weights to HDF5
-model.save_weights('weights.h5')
-model.save('./model_tf', save_format='tf')
-print("Saved model to disk")
 
+# serialize weights to HDF5
+model.save_weights('alexnet_layers_15epoch.h5')
+print("Saved model to disk")
