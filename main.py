@@ -134,7 +134,7 @@ print(
     "This image most likely belongs to {} with a {:.2f} percent confidence."
         .format(class_names[np.argmax(score)], 100 * np.max(score))
 )
+
 # serialize weights to HDF5
 model.save_weights('alexnet_layers_15epoch.h5')
-# model.save('./model_tf', save_format='tf') THIS DOES NOT WORK WITH AUGMENTATION LAYERS
 print("Saved model to disk")
