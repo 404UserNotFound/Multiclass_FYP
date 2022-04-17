@@ -1,11 +1,8 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import os
-import PIL
 import tensorflow as tf
 from keras.callbacks import ReduceLROnPlateau
-from tensorflow.keras import layers
-from tensorflow.keras.models import Sequential
 from tensorflow.keras.callbacks import EarlyStopping
 import pathlib
 
@@ -15,7 +12,7 @@ data_dir = os.path.abspath(dataset_url)
 
 data_dir = pathlib.Path(data_dir)
 batch_size = 32
-img_height = 227    #256
+img_height = 227
 img_width = 227
 train_ds = tf.keras.utils.image_dataset_from_directory(
     data_dir,
@@ -48,7 +45,7 @@ data_augmentation = tf.keras.Sequential(
         tf.keras.layers.RandomZoom(0.1)
     ]
 )
-# VISUALISE DATA AUG
+# SHOW DATA AUUGMENTATIONS
 plt.figure(figsize=(10, 10))
 for images, _ in train_ds.take(1):
     for i in range(9):
@@ -79,10 +76,6 @@ model = tf.keras.models.Sequential([
     tf.keras.layers.Dense(3, activation='softmax')
 ])
 
-print("Loading weights.")
-#model.load_weights('alexnet_layers.h5')
-print("weights loaded!")
-##dont forget you changed from_logits to false
 model.compile(optimizer=tf.keras.optimizers.SGD(learning_rate=0.001),
               loss='sparse_categorical_crossentropy',
               metrics=['accuracy'])
@@ -95,7 +88,7 @@ history = model.fit(
     validation_data=val_ds,
     validation_freq=1,
     epochs=15,
-    callbacks=[early_stop]  # add learning_rate too
+    callbacks=[early_stop]
 )
 
 acc = history.history['accuracy']
@@ -104,7 +97,6 @@ val_acc = history.history['val_accuracy']
 loss = history.history['loss']
 val_loss = history.history['val_loss']
 
-# epochs_range = range(epochs)
 
 plt.figure(figsize=(8, 8))
 plt.subplot(1, 2, 1)
