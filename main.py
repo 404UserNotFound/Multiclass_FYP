@@ -6,7 +6,9 @@ from keras.callbacks import ReduceLROnPlateau
 from tensorflow.keras.callbacks import EarlyStopping
 import pathlib
 
-dataset_url = "C:/Users/Mihaela/Downloads/multiclass_trimmed"
+dataset_dir = os.getcwd()
+dataset_url = dataset_dir + '\\multiclass_trimmed'
+#dataset_url = "C:/Users/Mihaela/Downloads/multiclass_trimmed"
 
 data_dir = os.path.abspath(dataset_url)
 

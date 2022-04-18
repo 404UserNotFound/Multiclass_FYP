@@ -31,7 +31,10 @@ print("Loading weights.")
 model.load_weights('alexnet_layers_50_no_stop_new_aug.h5')
 print("weights loaded!")
 
-img_path_dir = 'C:\\Users\\Mihaela\\Downloads\\test_photo'
+
+#img_path_dir = 'C:\\Users\\Mihaela\\Downloads\\test_photo'
+location_dir = os.getcwd()
+img_path_dir = location_dir + '\\test_photo'
 
 images = os.listdir(img_path_dir)
 
