@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="0f183c5c-52cc-448d-b356-380162c3cf49" name="Changes" comment="move dataset location" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Script" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="master" />
+      </map>
+    </option>
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="RESET_MODE" value="HARD" />
+  </component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/training.py" root0="SKIP_INSPECTION" />
+    <setting file="file://$PROJECT_DIR$/image_correction.py" root0="FORCE_HIGHLIGHTING" />
+  </component>
+  <component name="ProjectId" id="23wBBC8Wck2bMK2MC9ULlKrB1r4" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="ASKED_ADD_EXTERNAL_FILES" value="true" />
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/main.py" />
+    <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
+  </component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\Mihaela\PycharmProjects\Multiclass_FYP" />
+    </key>
+  </component>
+  <component name="RunManager">
+    <configuration name="main" type="PythonConfigurationType" factoryName="Python">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+        <env name="cuda_bin_path" value="C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.6\bin" />
+      </envs>
+      <option name="SDK_HOME" value="C:\Users\Mihaela\PycharmProjects\multiclass\venv\Scripts\python.exe" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="" />
+      <option name="SCRIPT_NAME" value="C:\Users\Mihaela\PycharmProjects\Multiclass_FYP\training.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="0f183c5c-52cc-448d-b356-380162c3cf49" name="Changes" comment="" />
+      <created>1642635130751</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1642635130751</updated>
+    </task>
+    <task id="LOCAL-00001" summary="updated">
+      <created>1642635791610</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1642635791610</updated>
+    </task>
+    <task id="LOCAL-00002" summary="up to date">
+      <created>1646679631789</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1646679631789</updated>
+    </task>
+    <task id="LOCAL-00003" summary="state: relu AF, 256*256, 512 dense">
+      <created>1647271682623</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1647271682624</updated>
+    </task>
+    <task id="LOCAL-00004" summary="alexnet-based architecture and best trained model">
+      <created>1650232049464</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1650232049464</updated>
+    </task>
+    <task id="LOCAL-00005" summary="alexnet-based architecture">
+      <created>1650232455341</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1650232455341</updated>
+    </task>
+    <task id="LOCAL-00006" summary="alexnet-based architecture">
+      <created>1650232644944</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1650232644944</updated>
+    </task>
+    <task id="LOCAL-00007" summary="alexnet-based architecture">
+      <created>1650232706557</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1650232706557</updated>
+    </task>
+    <task id="LOCAL-00008" summary="code for image correction">
+      <created>1650234181960</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1650234181960</updated>
+    </task>
+    <task id="LOCAL-00009" summary="clean up code">
+      <created>1650235216215</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1650235216215</updated>
+    </task>
+    <task id="LOCAL-00010" summary="clean up main">
+      <created>1650235282333</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1650235282333</updated>
+    </task>
+    <task id="LOCAL-00011" summary="clean up main">
+      <created>1650235367253</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1650235367253</updated>
+    </task>
+    <task id="LOCAL-00012" summary="remove unneeded files">
+      <created>1650235711531</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1650235711531</updated>
+    </task>
+    <task id="LOCAL-00013" summary="remove unneeded files">
+      <created>1650235878541</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1650235878541</updated>
+    </task>
+    <task id="LOCAL-00014" summary="rename main">
+      <created>1650236519917</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1650236519918</updated>
+    </task>
+    <task id="LOCAL-00015" summary="move dataset location">
+      <created>1650289187788</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1650289187788</updated>
+    </task>
+    <option name="localTasksCounter" value="16" />
+    <servers />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="oldMeFiltersMigrated" value="true" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
+    <MESSAGE value="updated" />
+    <MESSAGE value="up to date" />
+    <MESSAGE value="state: relu AF, 256*256, 512 dense" />
+    <MESSAGE value="alexnet-based architecture and best trained model" />
+    <MESSAGE value="alexnet-based architecture" />
+    <MESSAGE value="code for image correction" />
+    <MESSAGE value="clean up code" />
+    <MESSAGE value="clean up main" />
+    <MESSAGE value="remove unneeded files" />
+    <MESSAGE value="rename main" />
+    <MESSAGE value="move dataset location" />
+    <option name="LAST_COMMIT_MESSAGE" value="move dataset location" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/training.py</url>
+          <line>6</line>
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+  </component>
+</project>
