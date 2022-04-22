@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from keras.preprocessing import image
 import numpy as np
 import os
@@ -31,10 +33,7 @@ print("Loading weights.")
 model.load_weights('alexnet_layers_50_no_stop_new_aug.h5')
 print("weights loaded!")
 
-
-#img_path_dir = 'C:\\Users\\Mihaela\\Downloads\\test_photo'
-location_dir = os.getcwd()
-img_path_dir = location_dir + '\\test_photo'
+img_path_dir = 'C:\\Users\\Mihaela\\PycharmProjects\\Multiclass_FYP\\test_photo'
 
 images = os.listdir(img_path_dir)
 
@@ -103,6 +102,7 @@ def brightness_autocontrast(image, clip_hist_percent=1):
 for image_name in images:
     img_path = img_path_dir + "\\" + image_name
     img = image.load_img(img_path, target_size=(227, 227))  # for specific image size
+    img_large = image.load_img(img_path)
     img_b = img.copy()
     for idx in range(70):
         # img = image.load_img(img_path)
@@ -128,7 +128,7 @@ for image_name in images:
         )
 
         if idx == 0 or class_names[np.argmax(score)] == 'correct':
-            cv2.imshow("bob", cv2.cvtColor(np.uint8(image.img_to_array(img_b)), cv2.COLOR_BGR2RGB))
+            cv2.imshow("image", cv2.cvtColor(np.uint8(image.img_to_array(img_b)), cv2.COLOR_BGR2RGB))
             key = cv2.waitKey()
             if key == ord('q'):
                 exit()
@@ -136,8 +136,14 @@ for image_name in images:
                 break
 
         if class_names[np.argmax(score)] == 'correct':
+            date_time = datetime.now()
+            date_time = date_time.strftime("%m%d_%H-%M-%S")
+            date_str = date_time+".jpg"
+            img_large.save(date_str)
             break
         # x_b = gamma_trans(x_b, 1.05)
         # x_b = brightness_autocontrast(x_b)
         img_b = pillow_brightness(img_b, 0.99 if (class_names[np.argmax(score)] == 'overexposed') else 1.01)
+        img_large = pillow_brightness(img_large, 0.99 if (class_names[np.argmax(score)] == 'overexposed') else 1.01)
+
 
