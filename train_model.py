@@ -1,4 +1,3 @@
-import matplotlib.pyplot as plt
 import numpy as np
 import os
 import tensorflow as tf
@@ -6,16 +5,18 @@ from keras.callbacks import ReduceLROnPlateau
 from tensorflow.keras.callbacks import EarlyStopping
 import pathlib
 
+# fetch dataset location
 dataset_dir = os.getcwd()
 dataset_url = dataset_dir + '\\multiclass_trimmed'
-#dataset_url = "C:/Users/Mihaela/Downloads/multiclass_trimmed"
-
 data_dir = os.path.abspath(dataset_url)
-
 data_dir = pathlib.Path(data_dir)
+
+# set batch size and image dimensions
 batch_size = 32
 img_height = 227
 img_width = 227
+
+# split dataset into training and validation
 train_ds = tf.keras.utils.image_dataset_from_directory(
     data_dir,
     validation_split=0.2,
@@ -30,32 +31,26 @@ val_ds = tf.keras.utils.image_dataset_from_directory(
     seed=123,
     image_size=(img_height, img_width),
     batch_size=batch_size)
+
+#get class names
 class_names = train_ds.class_names
 print(class_names)
+# dynamically tune data prefetch
 AUTOTUNE = tf.data.AUTOTUNE
 train_ds = train_ds.cache().shuffle(1000).prefetch(buffer_size=AUTOTUNE)
 val_ds = val_ds.cache().prefetch(buffer_size=AUTOTUNE)
-
 num_classes = len(class_names)
 
-
+# augment data for reducing overfitting. The image is randomly flipped, rotated, and zoomed
 data_augmentation = tf.keras.Sequential(
     [
         tf.keras.layers.RandomFlip("horizontal",
                                    input_shape=(img_height, img_width, 3)),
-        tf.keras.layers.RandomRotation(0.1),
-        tf.keras.layers.RandomZoom(0.1)
+        tf.keras.layers.RandomRotation(0.25),
+        tf.keras.layers.RandomZoom(0.25)
     ]
 )
-# SHOW DATA AUUGMENTATIONS
-plt.figure(figsize=(10, 10))
-for images, _ in train_ds.take(1):
-    for i in range(9):
-        augmented_images = data_augmentation(images)
-        ax = plt.subplot(3, 3, i + 1)
-        plt.imshow(augmented_images[0].numpy().astype("uint8"))
-        plt.axis("off")
-
+# define model architecture, based on AlexNet architecture
 model = tf.keras.models.Sequential([
     tf.keras.layers.Conv2D(filters=96, kernel_size=(11,11), strides=(4,4), activation='relu', input_shape=(227,227,3)),
     tf.keras.layers.BatchNormalization(),
@@ -78,57 +73,42 @@ model = tf.keras.models.Sequential([
     tf.keras.layers.Dense(3, activation='softmax')
 ])
 
+# define model optimiser and learning rate
 model.compile(optimizer=tf.keras.optimizers.SGD(learning_rate=0.001),
               loss='sparse_categorical_crossentropy',
               metrics=['accuracy'])
-early_stop = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=5)
-#learning_rate = ReduceLROnPlateau(monitor='val_loss', factor=0.5, patience=1, verbose=1)
-model.summary()
+# early stopping callback used to prevent overfitting.
+early_stop = EarlyStopping(monitor='val_loss', mode='min',min_delta=0.001, verbose=1, patience=10)
+# learning_rate = ReduceLROnPlateau(monitor='val_loss', factor=0.5, patience=1, verbose=1)
 
+model.summary()
 history = model.fit(
     train_ds,
     validation_data=val_ds,
     validation_freq=1,
-    epochs=15,
+    epochs=1,
     callbacks=[early_stop]
 )
 
-acc = history.history['accuracy']
-val_acc = history.history['val_accuracy']
+# fetch specified image for testing after training model. A full directory can be tested instead, tests on single
+# image here for ease of use.
+img_path_dir = os.getcwd()
+test_url = img_path_dir + '\\test_photo\\corr.jpg'
 
-loss = history.history['loss']
-val_loss = history.history['val_loss']
-
-
-plt.figure(figsize=(8, 8))
-plt.subplot(1, 2, 1)
-plt.plot(acc, label='Training Accuracy')
-plt.plot(val_acc, label='Validation Accuracy')
-plt.legend(loc='lower right')
-plt.title('Training and Validation Accuracy')
-
-plt.subplot(1, 2, 2)
-plt.plot(loss, label='Training Loss')
-plt.plot(val_loss, label='Validation Loss')
-plt.legend(loc='upper right')
-plt.title('Training and Validation Loss')
-plt.show()
-test_url = "C:\\Users\\Mihaela\\Downloads\\test_photo\\barely_under.JPG"
-
+# load testing image with same dimensions as training images
 img = tf.keras.utils.load_img(
     test_url, target_size=(img_height, img_width)
 )
 img_array = tf.keras.utils.img_to_array(img)
 img_array = tf.expand_dims(img_array, 0)
-
 predictions = model.predict(img_array)
 score = tf.nn.softmax(predictions[0])
 
 print(
-    "This image most likely belongs to {} with a {:.2f} percent confidence."
+    "Your input image(s) most likely belongs to {} with a {:.2f} percent confidence."
         .format(class_names[np.argmax(score)], 100 * np.max(score))
 )
 
-# serialize weights to HDF5
-model.save_weights('alexnet_layers_15epoch.h5')
+# save weights as h5 file
+model.save_weights('alexnet_layers_50_no_stop_new_aug.h5')
 print("Saved model to disk")
