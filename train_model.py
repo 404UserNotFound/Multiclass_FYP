@@ -4,6 +4,7 @@ import tensorflow as tf
 from keras.callbacks import ReduceLROnPlateau
 from tensorflow.keras.callbacks import EarlyStopping
 import pathlib
+# Mihaela Brodetchi C00242687
 
 # fetch dataset location
 dataset_dir = os.getcwd()
@@ -86,7 +87,7 @@ history = model.fit(
     train_ds,
     validation_data=val_ds,
     validation_freq=1,
-    epochs=1,
+    epochs=200,
     callbacks=[early_stop]
 )
 

@@ -42,10 +42,10 @@ images = os.listdir(img_path_dir)
 
 
 # Image adjustment by gamma transformation
-def gamma_trans(img, gamma):
-    gamma_table = [np.power(x / 255.0, gamma) * 255.0 for x in range(256)]
-    gamma_table = np.round(np.array(gamma_table)).astype(np.uint8)
-    return cv2.LUT(img, gamma_table)
+def gamma_transformation(image, gamma):
+    gamma_lookup_table = [np.power(x / 255.0, gamma) * 255.0 for x in range(256)]
+    gamma_lookup_table = np.round(np.array(gamma_lookup_table)).astype(np.uint8)
+    return cv2.LUT(image, gamma_lookup_table)
 
 
 # Loop through the test dataset
@@ -86,5 +86,5 @@ for image_name in images:
         # image x_b is used on the display screen and to check exposure with neural network
         # img_large is edited separately. This is because the input image for the neural network must be 227*227
         # but the image saved to disk should be full sized.
-        x_b = gamma_trans(np.uint8(x_b), 1.05)
-        img_large = gamma_trans(cv2.cvtColor(np.uint8(img_large), cv2.COLOR_BGR2RGB), 1.05)
+        x_b = gamma_transformation(np.uint8(x_b), 1.05)
+        img_large = gamma_transformation(cv2.cvtColor(np.uint8(img_large), cv2.COLOR_BGR2RGB), 1.05)
