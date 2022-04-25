@@ -41,41 +41,32 @@ img_path_dir = img_path_dir + '\\test_photo'
 images = os.listdir(img_path_dir)
 
 
-def brightness_autocontrast(image, clip_hist_percent=1):
-    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-
-    # Calculate grayscale histogram
-    histogram = cv2.calcHist([gray], [0], None, [256], [0, 256])
-
-    hist_size = len(histogram)
-
-    # This calculates the cumulative distribution from the histogram
+def brightness_autocontrast(image, clip_histogram_percent=1):
+    greyscale = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    # Calculate greyscale histogram
+    histogram = cv2.calcHist([greyscale], [0], None, [256], [0, 256])
+    histogram_size = len(histogram)
+    # This calculates the distribution of the histogram
     accumulator = []
     accumulator.append(float(histogram[0]))
-    for index in range(1, hist_size):
+    for index in range(1, histogram_size):
         accumulator.append(accumulator[index - 1] + float(histogram[index]))
-
-    # Locate points to clip
-    maximum = accumulator[-1]
-    clip_hist_percent *= (maximum / 100.0)
-    clip_hist_percent /= 2.0
-
-    # Locate left cut
-    minimum_gray = 0
-    while accumulator[minimum_gray] < clip_hist_percent:
-        minimum_gray += 1
-
-    # Locate right cut
-    maximum_gray = hist_size - 1
-    while accumulator[maximum_gray] >= (maximum - clip_hist_percent):
-        maximum_gray -= 1
-
-    # Calculate alpha and beta values
-    alpha = 255 / (maximum_gray - minimum_gray)
-    beta = -minimum_gray * alpha
-    #print(alpha, beta)
-    auto_result = cv2.convertScaleAbs(image, alpha=alpha, beta=beta)
-    return auto_result
+    # Locate which points to cut from histogram
+    max = accumulator[-1]
+    clip_histogram_percent *= (max / 100.0)
+    clip_histogram_percent /= 2.0
+    # Cut right and left parts from histogram
+    min_grey = 0
+    while accumulator[min_grey] < clip_histogram_percent:
+        min_grey += 1
+    max_grey = histogram_size - 1
+    while accumulator[max_grey] >= (max - clip_histogram_percent):
+        max_grey -= 1
+    # Get alpha and beta values
+    alpha = 255 / (max_grey - min_grey)
+    beta = -min_grey * alpha
+    final_result = cv2.convertScaleAbs(image, alpha=alpha, beta=beta)
+    return final_result
 
 
 # Loop through the test dataset
